@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"
+
 import { type NextRequest, NextResponse } from "next/server"
 import { updateUserBet, getUserProfile } from "@/lib/db-utils"
 import crypto from "crypto"

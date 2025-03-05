@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"
+
 import { streamText } from "ai"
 import { openai } from "@ai-sdk/openai"
 
