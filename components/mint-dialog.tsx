@@ -68,6 +68,7 @@ type TransactionState = {
   status: "idle" | "pending" | "approving" | "success" | "error"
   hash?: `0x${string}`
   message: string
+  showOverlay: boolean
 }
 
 export function MintDialog({ open, onOpenChange }: MintDialogProps) {
@@ -77,6 +78,7 @@ export function MintDialog({ open, onOpenChange }: MintDialogProps) {
   const [transaction, setTransaction] = useState<TransactionState>({
     status: "idle",
     message: "",
+    showOverlay: false,
   })
 
   const { writeContract: mintWrite, isPending: isMintPending, data: mintTxHash } = useMint69Usdc()
@@ -127,12 +129,14 @@ export function MintDialog({ open, onOpenChange }: MintDialogProps) {
       setTransaction({
         status: "pending",
         message: "Waiting for confirmation...",
+        showOverlay: true,
       })
     } else if (isMintLoading) {
       setTransaction({
         status: "pending",
         hash: mintTxHash,
         message: "Minting 69USDC tokens...",
+        showOverlay: true,
       })
     } else if (isMintSuccess && mintTxHash) {
       // Refresh balances immediately after successful mint
@@ -147,11 +151,12 @@ export function MintDialog({ open, onOpenChange }: MintDialogProps) {
               status: "success",
               hash: mintTxHash,
               message: "Transaction successful!",
+              showOverlay: true,
             })
             toast.success(`Successfully minted ${tokensAmount} 69USDC tokens!`)
             setTimeout(() => {
               onOpenChange(false)
-              setTransaction({ status: "idle", message: "" })
+              setTransaction({ status: "idle", message: "", showOverlay: false })
             }, 1500)
           })
           .catch((error) => {
@@ -161,16 +166,17 @@ export function MintDialog({ open, onOpenChange }: MintDialogProps) {
               status: "success",
               hash: mintTxHash,
               message: "Transaction successful!",
+              showOverlay: true,
             })
             toast.success(`Successfully minted ${tokensAmount} 69USDC tokens!`)
             setTimeout(() => {
               onOpenChange(false)
-              setTransaction({ status: "idle", message: "" })
+              setTransaction({ status: "idle", message: "", showOverlay: false })
             }, 1500)
           })
       }
     } else if (isMintError) {
-      setTransaction({ status: "idle", message: "" })
+      setTransaction({ status: "idle", message: "", showOverlay: false })
       toast.error("Transaction rejected")
     }
   }, [
@@ -191,7 +197,7 @@ export function MintDialog({ open, onOpenChange }: MintDialogProps) {
     } catch (error) {
       console.error("Error withdrawing tokens:", error)
       toast.error("Transaction rejected")
-      setTransaction({ status: "idle", message: "" })
+      setTransaction({ status: "idle", message: "", showOverlay: false })
     }
   }, [burnWrite, tokenAmount])
 
@@ -201,12 +207,14 @@ export function MintDialog({ open, onOpenChange }: MintDialogProps) {
       setTransaction({
         status: "approving",
         message: "Waiting for approval confirmation...",
+        showOverlay: true,
       })
     } else if (isApproveLoading) {
       setTransaction({
         status: "approving",
         hash: approveTxHash,
         message: "Approving 69USDC tokens...",
+        showOverlay: true,
       })
     } else if (isApproveSuccess) {
       // Refresh allowances
@@ -216,14 +224,15 @@ export function MintDialog({ open, onOpenChange }: MintDialogProps) {
         status: "success",
         hash: approveTxHash,
         message: "Approval successful!",
+        showOverlay: true,
       })
       toast.success("Approval successful")
       setTimeout(() => {
-        setTransaction({ status: "idle", message: "" })
+        setTransaction({ status: "idle", message: "", showOverlay: true })
         handleBurn()
       }, 1000)
     } else if (isApproveError) {
-      setTransaction({ status: "idle", message: "" })
+      setTransaction({ status: "idle", message: "", showOverlay: false })
       toast.error("Transaction rejected")
     }
   }, [isApprovePending, isApproveLoading, isApproveSuccess, isApproveError, approveTxHash, refreshBalances, handleBurn])
@@ -234,12 +243,14 @@ export function MintDialog({ open, onOpenChange }: MintDialogProps) {
       setTransaction({
         status: "pending",
         message: "Waiting for confirmation...",
+        showOverlay: true,
       })
     } else if (isBurnLoading) {
       setTransaction({
         status: "pending",
         hash: burnTxHash,
         message: "Withdrawing ETH...",
+        showOverlay: true,
       })
     } else if (isBurnSuccess && burnTxHash) {
       // Refresh balances immediately after successful burn
@@ -254,11 +265,12 @@ export function MintDialog({ open, onOpenChange }: MintDialogProps) {
               status: "success",
               hash: burnTxHash,
               message: "Transaction successful!",
+              showOverlay: true,
             })
             toast.success(`Successfully withdrawn ${ethAmount} ETH!`)
             setTimeout(() => {
               onOpenChange(false)
-              setTransaction({ status: "idle", message: "" })
+              setTransaction({ status: "idle", message: "", showOverlay: false })
             }, 1500)
           })
           .catch((error) => {
@@ -268,16 +280,17 @@ export function MintDialog({ open, onOpenChange }: MintDialogProps) {
               status: "success",
               hash: burnTxHash,
               message: "Transaction successful!",
+              showOverlay: true,
             })
             toast.success(`Successfully withdrawn ${ethAmount} ETH!`)
             setTimeout(() => {
               onOpenChange(false)
-              setTransaction({ status: "idle", message: "" })
+              setTransaction({ status: "idle", message: "", showOverlay: false })
             }, 1500)
           })
       }
     } else if (isBurnError) {
-      setTransaction({ status: "idle", message: "" })
+      setTransaction({ status: "idle", message: "", showOverlay: false })
       toast.error("Transaction rejected")
     }
   }, [
@@ -296,27 +309,37 @@ export function MintDialog({ open, onOpenChange }: MintDialogProps) {
   useEffect(() => {
     // If we were in a pending state but isPending becomes false without a success or error
     // This likely means the user rejected the transaction in their wallet
-    if (transaction.status === "pending" && !isMintPending && !isMintLoading && !isMintSuccess && !isMintError) {
-      setTransaction({ status: "idle", message: "" })
-      toast.error("Transaction rejected")
-    }
-
     if (
-      transaction.status === "approving" &&
-      !isApprovePending &&
-      !isApproveLoading &&
-      !isApproveSuccess &&
-      !isApproveError
+      transaction.showOverlay &&
+      ((transaction.status === "pending" &&
+        !isMintPending &&
+        !isMintLoading &&
+        !isMintSuccess &&
+        !isMintError &&
+        !isBurnPending &&
+        !isBurnLoading &&
+        !isBurnSuccess &&
+        !isBurnError) ||
+        (transaction.status === "approving" &&
+          !isApprovePending &&
+          !isApproveLoading &&
+          !isApproveSuccess &&
+          !isApproveError))
     ) {
-      setTransaction({ status: "idle", message: "" })
+      setTransaction({ status: "idle", message: "", showOverlay: false })
       toast.error("Transaction rejected")
     }
   }, [
     transaction.status,
+    transaction.showOverlay,
     isMintPending,
     isMintLoading,
     isMintSuccess,
     isMintError,
+    isBurnPending,
+    isBurnLoading,
+    isBurnSuccess,
+    isBurnError,
     isApprovePending,
     isApproveLoading,
     isApproveSuccess,
@@ -335,11 +358,27 @@ export function MintDialog({ open, onOpenChange }: MintDialogProps) {
     }
 
     try {
+      setTransaction({
+        status: "pending",
+        message: "Preparing transaction...",
+        showOverlay: true,
+      })
+
+      // Add a timeout to detect if the transaction was not initiated
+      const timeoutId = setTimeout(() => {
+        if (transaction.showOverlay && !isMintPending && !isMintLoading) {
+          setTransaction({ status: "idle", message: "", showOverlay: false })
+        }
+      }, 3000) // 3 seconds timeout
+
       await mintTokens(mintWrite, ethAmount)
+
+      // Clear the timeout if the transaction was initiated
+      clearTimeout(timeoutId)
     } catch (error) {
       console.error("Error minting tokens:", error)
       toast.error("Transaction rejected")
-      setTransaction({ status: "idle", message: "" })
+      setTransaction({ status: "idle", message: "", showOverlay: false })
     }
   }
 
@@ -361,11 +400,27 @@ export function MintDialog({ open, onOpenChange }: MintDialogProps) {
     }
 
     try {
+      setTransaction({
+        status: "pending",
+        message: "Preparing approval...",
+        showOverlay: true,
+      })
+
+      // Add a timeout to detect if the transaction was not initiated
+      const timeoutId = setTimeout(() => {
+        if (transaction.showOverlay && !isApprovePending && !isApproveLoading) {
+          setTransaction({ status: "idle", message: "", showOverlay: false })
+        }
+      }, 3000) // 3 seconds timeout
+
       await approveMinter(tokenWrite, tokenAmount)
+
+      // Clear the timeout if the transaction was initiated
+      clearTimeout(timeoutId)
     } catch (error) {
       console.error("Error approving tokens:", error)
       toast.error("Transaction rejected")
-      setTransaction({ status: "idle", message: "" })
+      setTransaction({ status: "idle", message: "", showOverlay: false })
     }
   }
 
@@ -373,9 +428,32 @@ export function MintDialog({ open, onOpenChange }: MintDialogProps) {
     await handleApprove()
   }
 
+  // Add a cleanup function to the component to ensure transaction state is reset when unmounting
+  useEffect(() => {
+    return () => {
+      // Reset transaction state when component unmounts
+      setTransaction({ status: "idle", message: "", showOverlay: false })
+    }
+  }, [])
+
+  // Add a new useEffect to handle dialog close events
+  useEffect(() => {
+    if (!open) {
+      // Reset transaction state when dialog is closed
+      setTransaction({ status: "idle", message: "", showOverlay: false })
+    }
+  }, [open])
+
+  // Handle close overlay
+  const handleCloseOverlay = () => {
+    setTransaction((prev) => ({ ...prev, showOverlay: false }))
+  }
+
   return (
     <>
-      {transaction.status !== "idle" && <TransactionOverlay message={transaction.message} />}
+      {transaction.showOverlay && (
+        <TransactionOverlay message={transaction.message} status={transaction.status} onClose={handleCloseOverlay} />
+      )}
 
       <Dialog
         open={open}

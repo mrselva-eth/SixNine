@@ -479,7 +479,7 @@ export default function DiceGame() {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="bg-[#1a1f2e]/90 backdrop-blur-sm p-2 rounded-xl border border-gray-800 shadow-lg">
+              <div className="bg-[#1a1f2e]/90 backdrop-blur-sm p-2 rounded-xl border border-gray-800 shadow-lg" style={{ width: '60px' }}>
                 <h3 className="text-center text-[#0affff] font-bold mb-2">PR</h3>
                 <div className="flex flex-col gap-2 max-h-[70vh] overflow-y-auto">
                   {rollHistory.length > 0 ? (
@@ -489,7 +489,7 @@ export default function DiceGame() {
                         initial={{ scale: 0, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ duration: 0.2, delay: index * 0.05 }}
-                        className={`w-10 h-10 flex items-center justify-center rounded-full text-sm font-bold ${
+                        className={`w-8 h-8 flex items-center justify-center rounded-full text-sm font-bold ${
                           item.outcome === "win"
                             ? "bg-[#0affff]/20 text-[#0affff] border border-[#0affff]/50"
                             : "bg-red-600/20 text-red-400 border border-red-500/50"

@@ -7,6 +7,7 @@ import { useAccount } from "wagmi"
 import { useConnectModal } from "@rainbow-me/rainbowkit"
 import { ArrowRight, Shield, Dice1Icon as Dice, BarChart2, Trophy, Coins } from "lucide-react"
 import { fetchLeaderboard } from "@/utils/game-contract"
+import { SiteFooter } from "@/components/site-footer" // Import the footer component
 
 export default function HomePage() {
   const { isConnected } = useAccount()
@@ -481,6 +482,9 @@ export default function HomePage() {
           </motion.div>
         </div>
       </section>
+
+      {/* Add the footer component */}
+      <SiteFooter />
     </div>
   )
 }

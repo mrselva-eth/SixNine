@@ -243,7 +243,13 @@ export function WalletSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: (
           <div className="mt-auto pb-6 space-y-4">
             {activeTab === "wallet" && (
               <div className="flex justify-center">
-                <button className="mint-button" onClick={() => setMintDialogOpen(true)}>
+                <button
+                  className="mint-button"
+                  onClick={() => {
+                    // Reset any previous transaction state before opening
+                    setMintDialogOpen(true)
+                  }}
+                >
                   <span>Exchange 69USDC</span>
                   <div id="clip">
                     <div id="leftTop" className="corner"></div>

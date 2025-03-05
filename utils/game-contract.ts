@@ -116,7 +116,9 @@ export function withdrawFromGame(
   })
 }
 
-// Fetch user game balance from MongoDB
+// Ensure the fetchGameBalance function is properly implemented to get the latest balance
+// Make sure this function is exported and used in the SiteHeader component
+
 export async function fetchGameBalance(address: string): Promise<string> {
   try {
     const response = await fetch(`/api/game/balance?address=${address}`)

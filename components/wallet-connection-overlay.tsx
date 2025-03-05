@@ -2,14 +2,18 @@
 
 import { useAccount } from "wagmi"
 import { useConnectModal } from "@rainbow-me/rainbowkit"
-import { Wallet } from "lucide-react"
+import { Wallet, Home } from "lucide-react"
 import { motion } from "framer-motion"
+import { usePathname } from "next/navigation"
+import Link from "next/link"
 
 export function WalletConnectionOverlay() {
   const { isConnected } = useAccount()
   const { openConnectModal } = useConnectModal()
+  const pathname = usePathname()
 
-  if (isConnected) {
+  // Don't show overlay on home page
+  if (isConnected || pathname === "/") {
     return null
   }
 
@@ -34,9 +38,19 @@ export function WalletConnectionOverlay() {
           supported wallet to continue.
         </p>
 
-        <button onClick={openConnectModal} className="cti w-full">
-          <span className="CTI">Connect Wallet</span>
-        </button>
+        <div className="space-y-4">
+          <button onClick={openConnectModal} className="cti w-full">
+            <span className="CTI">Connect Wallet</span>
+          </button>
+
+          <Link
+            href="/"
+            className="flex items-center justify-center gap-2 w-full px-6 py-3 bg-transparent border-2 border-[#0affff] text-[#0affff] rounded-lg hover:bg-[#0affff]/10 transition-all duration-300 font-bold"
+          >
+            <Home className="w-5 h-5" />
+            Return to Home
+          </Link>
+        </div>
 
         <p className="mt-4 text-sm text-gray-500">Make sure you're on the Sepolia testnet to use this platform.</p>
       </motion.div>

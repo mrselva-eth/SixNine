@@ -21,6 +21,7 @@ type TransactionState = {
   status: "idle" | "pending" | "approving" | "success" | "error"
   hash?: `0x${string}`
   message: string
+  showOverlay: boolean
 }
 
 export function DepositDialog({ open, onOpenChange, onSuccess }: DepositDialogProps) {
@@ -28,6 +29,7 @@ export function DepositDialog({ open, onOpenChange, onSuccess }: DepositDialogPr
   const [transaction, setTransaction] = useState<TransactionState>({
     status: "idle",
     message: "",
+    showOverlay: false,
   })
 
   const { address, isConnected } = useAccount()
@@ -60,28 +62,31 @@ export function DepositDialog({ open, onOpenChange, onSuccess }: DepositDialogPr
       setTransaction({
         status: "approving",
         message: "Waiting for approval confirmation...",
+        showOverlay: true,
       })
     } else if (isApproveLoading) {
       setTransaction({
         status: "approving",
         hash: approveTxHash,
         message: "Approving 69USDC tokens...",
+        showOverlay: true,
       })
     } else if (isApproveSuccess) {
       setTransaction({
         status: "success",
         hash: approveTxHash,
         message: "Approval successful!",
+        showOverlay: true,
       })
       toast.success("Approval successful")
 
       // Proceed to deposit after approval
       setTimeout(() => {
-        setTransaction({ status: "idle", message: "" })
+        setTransaction({ status: "idle", message: "", showOverlay: true })
         executeDeposit() // Call the actual deposit function
       }, 1000)
     } else if (isApproveError) {
-      setTransaction({ status: "idle", message: "" })
+      setTransaction({ status: "idle", message: "", showOverlay: false })
       toast.error("Approval rejected")
     }
   }, [isApprovePending, isApproveLoading, isApproveSuccess, isApproveError, approveTxHash])
@@ -92,18 +97,21 @@ export function DepositDialog({ open, onOpenChange, onSuccess }: DepositDialogPr
       setTransaction({
         status: "pending",
         message: "Waiting for deposit confirmation...",
+        showOverlay: true,
       })
     } else if (isDepositLoading) {
       setTransaction({
         status: "pending",
         hash: depositTxHash,
         message: "Depositing 69USDC tokens...",
+        showOverlay: true,
       })
     } else if (isDepositSuccess && depositTxHash) {
       setTransaction({
         status: "success",
         hash: depositTxHash,
         message: "Deposit successful!",
+        showOverlay: true,
       })
 
       // Update MongoDB with deposit info
@@ -113,9 +121,10 @@ export function DepositDialog({ open, onOpenChange, onSuccess }: DepositDialogPr
             toast.success(`Successfully deposited ${amount} 69USDC tokens!`)
             if (onSuccess) onSuccess()
 
+            // Keep the dialog open for a moment to show success, then close it
             setTimeout(() => {
               onOpenChange(false)
-              setTransaction({ status: "idle", message: "" })
+              setTransaction({ status: "idle", message: "", showOverlay: false })
             }, 1500)
           })
           .catch((error) => {
@@ -124,7 +133,7 @@ export function DepositDialog({ open, onOpenChange, onSuccess }: DepositDialogPr
           })
       }
     } else if (isDepositError) {
-      setTransaction({ status: "idle", message: "" })
+      setTransaction({ status: "idle", message: "", showOverlay: false })
       toast.error("Deposit rejected")
     }
   }, [
@@ -136,6 +145,36 @@ export function DepositDialog({ open, onOpenChange, onSuccess }: DepositDialogPr
     onOpenChange,
     onSuccess,
     isDepositLoading,
+    isDepositError,
+  ])
+
+  // Add this useEffect to detect when a transaction is canceled in the wallet
+  useEffect(() => {
+    // If we were in a pending state but isPending becomes false without a success or error
+    // This likely means the user rejected the transaction in their wallet
+    if (
+      transaction.showOverlay &&
+      !isApprovePending &&
+      !isApproveLoading &&
+      !isApproveSuccess &&
+      !isApproveError &&
+      !isDepositPending &&
+      !isDepositLoading &&
+      !isDepositSuccess &&
+      !isDepositError
+    ) {
+      setTransaction({ status: "idle", message: "", showOverlay: false })
+      toast.error("Transaction rejected")
+    }
+  }, [
+    transaction.showOverlay,
+    isApprovePending,
+    isApproveLoading,
+    isApproveSuccess,
+    isApproveError,
+    isDepositPending,
+    isDepositLoading,
+    isDepositSuccess,
     isDepositError,
   ])
 
@@ -158,11 +197,27 @@ export function DepositDialog({ open, onOpenChange, onSuccess }: DepositDialogPr
     }
 
     try {
+      setTransaction({
+        status: "pending",
+        message: "Preparing approval...",
+        showOverlay: true,
+      })
+
+      // Add a timeout to detect if the transaction was not initiated
+      const timeoutId = setTimeout(() => {
+        if (transaction.showOverlay && !isApprovePending && !isApproveLoading) {
+          setTransaction({ status: "idle", message: "", showOverlay: false })
+        }
+      }, 3000) // 3 seconds timeout
+
       await approveTokens(tokenWrite, DICE_GAME_CONTRACT_ADDRESS as `0x${string}`, amount)
+
+      // Clear the timeout if the transaction was initiated
+      clearTimeout(timeoutId)
     } catch (error) {
       console.error("Error approving tokens:", error)
       toast.error("Transaction rejected")
-      setTransaction({ status: "idle", message: "" })
+      setTransaction({ status: "idle", message: "", showOverlay: false })
     }
   }
 
@@ -178,13 +233,20 @@ export function DepositDialog({ open, onOpenChange, onSuccess }: DepositDialogPr
     } catch (error) {
       console.error("Error depositing tokens:", error)
       toast.error("Transaction rejected")
-      setTransaction({ status: "idle", message: "" })
+      setTransaction({ status: "idle", message: "", showOverlay: false })
     }
+  }
+
+  // Handle close overlay
+  const handleCloseOverlay = () => {
+    setTransaction((prev) => ({ ...prev, showOverlay: false }))
   }
 
   return (
     <>
-      {transaction.status !== "idle" && <TransactionOverlay message={transaction.message} />}
+      {transaction.showOverlay && (
+        <TransactionOverlay message={transaction.message} status={transaction.status} onClose={handleCloseOverlay} />
+      )}
 
       <Dialog
         open={open}

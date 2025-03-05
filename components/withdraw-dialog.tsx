@@ -20,6 +20,7 @@ type TransactionState = {
   status: "idle" | "pending" | "success" | "error"
   hash?: `0x${string}`
   message: string
+  showOverlay: boolean
 }
 
 export function WithdrawDialog({ open, onOpenChange, onSuccess }: WithdrawDialogProps) {
@@ -28,6 +29,7 @@ export function WithdrawDialog({ open, onOpenChange, onSuccess }: WithdrawDialog
   const [transaction, setTransaction] = useState<TransactionState>({
     status: "idle",
     message: "",
+    showOverlay: false,
   })
 
   const { address, isConnected } = useAccount()
@@ -57,18 +59,21 @@ export function WithdrawDialog({ open, onOpenChange, onSuccess }: WithdrawDialog
       setTransaction({
         status: "pending",
         message: "Waiting for withdrawal confirmation...",
+        showOverlay: true,
       })
     } else if (isWithdrawLoading) {
       setTransaction({
         status: "pending",
         hash: withdrawTxHash,
         message: "Withdrawing 69USDC tokens...",
+        showOverlay: true,
       })
     } else if (isWithdrawSuccess && withdrawTxHash) {
       setTransaction({
         status: "success",
         hash: withdrawTxHash,
         message: "Withdrawal successful!",
+        showOverlay: true,
       })
 
       // Update MongoDB with withdrawal info
@@ -80,7 +85,7 @@ export function WithdrawDialog({ open, onOpenChange, onSuccess }: WithdrawDialog
 
             setTimeout(() => {
               onOpenChange(false)
-              setTransaction({ status: "idle", message: "" })
+              setTransaction({ status: "idle", message: "", showOverlay: false })
             }, 1500)
           })
           .catch((error) => {
@@ -89,7 +94,7 @@ export function WithdrawDialog({ open, onOpenChange, onSuccess }: WithdrawDialog
           })
       }
     } else if (isWithdrawError) {
-      setTransaction({ status: "idle", message: "" })
+      setTransaction({ status: "idle", message: "", showOverlay: false })
       toast.error("Withdrawal rejected")
     }
   }, [
@@ -103,6 +108,16 @@ export function WithdrawDialog({ open, onOpenChange, onSuccess }: WithdrawDialog
     onOpenChange,
     onSuccess,
   ])
+
+  // Add this useEffect to detect when a transaction is canceled in the wallet
+  useEffect(() => {
+    // If we were in a pending state but isPending becomes false without a success or error
+    // This likely means the user rejected the transaction in their wallet
+    if (transaction.showOverlay && !isWithdrawPending && !isWithdrawLoading && !isWithdrawSuccess && !isWithdrawError) {
+      setTransaction({ status: "idle", message: "", showOverlay: false })
+      toast.error("Transaction rejected")
+    }
+  }, [transaction.showOverlay, isWithdrawPending, isWithdrawLoading, isWithdrawSuccess, isWithdrawError])
 
   // Handle withdraw
   const handleWithdraw = async () => {
@@ -122,17 +137,40 @@ export function WithdrawDialog({ open, onOpenChange, onSuccess }: WithdrawDialog
     }
 
     try {
+      setTransaction({
+        status: "pending",
+        message: "Preparing transaction...",
+        showOverlay: true,
+      })
+
+      // Add a timeout to detect if the transaction was not initiated
+      const timeoutId = setTimeout(() => {
+        if (transaction.showOverlay && !isWithdrawPending && !isWithdrawLoading) {
+          setTransaction({ status: "idle", message: "", showOverlay: false })
+        }
+      }, 3000) // 3 seconds timeout
+
       await withdrawFromGame(gameWrite, amount)
+
+      // Clear the timeout if the transaction was initiated
+      clearTimeout(timeoutId)
     } catch (error) {
       console.error("Error withdrawing tokens:", error)
       toast.error("Transaction rejected")
-      setTransaction({ status: "idle", message: "" })
+      setTransaction({ status: "idle", message: "", showOverlay: false })
     }
+  }
+
+  // Handle close overlay
+  const handleCloseOverlay = () => {
+    setTransaction((prev) => ({ ...prev, showOverlay: false }))
   }
 
   return (
     <>
-      {transaction.status !== "idle" && <TransactionOverlay message={transaction.message} />}
+      {transaction.showOverlay && (
+        <TransactionOverlay message={transaction.message} status={transaction.status} onClose={handleCloseOverlay} />
+      )}
 
       <Dialog
         open={open}

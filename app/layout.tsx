@@ -5,8 +5,10 @@ import "./globals.css"
 import { Toaster } from "sonner"
 import "@rainbow-me/rainbowkit/styles.css"
 import { RainbowKitProvider, getDefaultConfig } from "@rainbow-me/rainbowkit"
+// Import the configureChains function from wagmi
 import { WagmiProvider } from "wagmi"
 import { sepolia } from "wagmi/chains"
+import { http } from "wagmi"
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query"
 import { SiteHeader } from "@/components/site-header"
 import { MainSidebar } from "@/components/main-sidebar"
@@ -15,11 +17,19 @@ import { usePathname } from "next/navigation"
 
 const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID!
 
+// Get the RPC URL from environment variables
+const sepoliaRpcUrl = process.env.NEXT_PUBLIC_SEPOLIA_RPC_URL
+
+// Create a custom config with your Infura RPC URL
 const config = getDefaultConfig({
   appName: "SixNine(69)",
   projectId: projectId,
-  chains: [sepolia], // Only using Sepolia testnet
+  chains: [sepolia],
   ssr: true,
+  // Fix the transports configuration to use the http function
+  transports: {
+    [sepolia.id]: sepoliaRpcUrl ? http(sepoliaRpcUrl) : http(`https://sepolia.infura.io/v3/${projectId}`),
+  },
 })
 
 const queryClient = new QueryClient()
@@ -46,12 +56,26 @@ export default function RootLayout({
               <div className={`relative flex min-h-screen flex-col ${isDiceGamePage ? "hide-scrollbar" : ""}`}>
                 <SiteHeader />
                 <MainSidebar />
-                <main className={`flex-1 ml-[70px] lg:ml-[70px] pt-0 ${isDiceGamePage ? "hide-scrollbar" : ""}`}>
+                <main className={`flex-1 ml-[70px] lg:ml-[70px] ${isDiceGamePage ? "hide-scrollbar" : ""}`}>
                   {children}
                 </main>
                 <WalletConnectionOverlay />
               </div>
-              <Toaster position="top-right" richColors />
+              <Toaster
+                position="bottom-right"
+                richColors
+                closeButton
+                theme="dark"
+                expand
+                visibleToasts={6}
+                toastOptions={{
+                  style: {
+                    background: "#1a1f2e",
+                    border: "1px solid #374151",
+                    color: "white",
+                  },
+                }}
+              />
             </RainbowKitProvider>
           </QueryClientProvider>
         </WagmiProvider>

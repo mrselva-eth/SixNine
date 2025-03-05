@@ -62,10 +62,17 @@ export async function getUserProfile(address: string): Promise<UserProfile> {
   // Convert address to lowercase for consistency
   address = address.toLowerCase()
 
-  // Try to find existing user
-  const existingUser = await db.collection("users").findOne({ address })
+  // Try to find existing user with case-insensitive search
+  const existingUser = await db.collection("users").findOne({
+    address: { $regex: new RegExp(`^${address}$`, "i") },
+  })
 
   if (existingUser) {
+    // If the stored address has different casing, update it to lowercase
+    if (existingUser.address !== address) {
+      await db.collection("users").updateOne({ _id: existingUser._id }, { $set: { address: address } })
+      existingUser.address = address
+    }
     return existingUser as UserProfile
   }
 
@@ -82,6 +89,13 @@ export async function getUserProfile(address: string): Promise<UserProfile> {
     bets: [],
     createdAt: new Date(),
     updatedAt: new Date(),
+  }
+
+  // Use unique index to prevent race conditions
+  try {
+    await db.collection("users").createIndex({ address: 1 }, { unique: true })
+  } catch (error) {
+    console.warn("Index already exists")
   }
 
   await db.collection("users").insertOne(newUser)

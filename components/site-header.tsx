@@ -7,12 +7,14 @@ import { useAccount } from "wagmi"
 import { use69UsdcBalance } from "@/utils/token-contract"
 import { fetchGameBalance } from "@/utils/game-contract"
 import { WithdrawDialog } from "./withdraw-dialog"
+import { DepositDialog } from "./deposit-dialog"
 
 export function SiteHeader() {
-  const { address } = useAccount()
+  const { address, isConnected } = useAccount()
   const { data: tokenBalance, refetch } = use69UsdcBalance(address)
   const [gameBalance, setGameBalance] = useState("0")
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false)
+  const [isDepositOpen, setIsDepositOpen] = useState(false)
 
   // Fetch game balance from MongoDB
   const fetchBalance = useCallback(async () => {
@@ -46,39 +48,50 @@ export function SiteHeader() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full border-b border-gray-800 bg-black/50 backdrop-blur-sm">
-        <div className="relative w-full h-20">
-          <div className="absolute left-0 top-1/2 -translate-y-1/2">
-            <Link href="/">
-              <Image src="/logo.png" alt="Project Logo" width={200} height={75} className="object-contain" priority />
-            </Link>
-          </div>
-
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-4">
-            <div className="flex items-center gap-3">
-              <Image src="/69usdc.png" alt="69USDC" width={30} height={30} />
-              <span className="text-white font-bold">Game Balance:</span>
-              <div className="border border-[#01ffff] px-4 py-1">
-                <span className="text-white font-bold text-2xl">{gameBalance}</span>
-              </div>
-              {address && Number(gameBalance) > 0 && (
-                <button
-                  onClick={() => setIsWithdrawOpen(true)}
-                  className="ml-2 px-3 py-1 bg-cyan-500 text-black rounded-md text-sm font-bold hover:bg-cyan-600"
-                >
-                  Transfer to Wallet
-                </button>
-              )}
+      <header className="sticky top-0 z-50 w-full border-b border-gray-800 bg-black/50 backdrop-blur-sm h-20">
+        <div className="relative h-full flex items-center justify-between px-4">
+          <div className="flex items-center">
+            <div className="border border-[#01ffff] rounded p-1 h-16 flex items-center">
+              <Link href="/">
+                <Image src="/logo.png" alt="Project Logo" width={160} height={48} className="object-contain" priority />
+              </Link>
             </div>
           </div>
 
-          <div className="absolute right-4 top-1/2 -translate-y-1/2">
+          <div className="flex items-center gap-3">
+            <Image src="/69usdc.png" alt="69USDC" width={30} height={30} />
+            <span className="text-white font-bold">Game Balance:</span>
+            <div className="border border-[#01ffff] px-4 py-1">
+              <span className="text-white font-bold text-2xl">{gameBalance}</span>
+            </div>
+            {isConnected && (
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setIsDepositOpen(true)}
+                  className="ml-2 px-3 py-1 bg-cyan-500 text-black rounded-md text-sm font-bold hover:bg-cyan-600"
+                >
+                  Deposit 69USDC
+                </button>
+                {Number(gameBalance) > 0 && (
+                  <button
+                    onClick={() => setIsWithdrawOpen(true)}
+                    className="px-3 py-1 bg-cyan-500 text-black rounded-md text-sm font-bold hover:bg-cyan-600"
+                  >
+                    Transfer to Wallet
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className="flex items-center">
             <CustomConnectButton />
           </div>
         </div>
       </header>
 
       <WithdrawDialog open={isWithdrawOpen} onOpenChange={setIsWithdrawOpen} onSuccess={fetchBalance} />
+      <DepositDialog open={isDepositOpen} onOpenChange={setIsDepositOpen} onSuccess={fetchBalance} />
     </>
   )
 }
