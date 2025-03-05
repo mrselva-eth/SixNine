@@ -5,31 +5,27 @@ import "./globals.css"
 import { Toaster } from "sonner"
 import "@rainbow-me/rainbowkit/styles.css"
 import { RainbowKitProvider, getDefaultConfig } from "@rainbow-me/rainbowkit"
-// Import the configureChains function from wagmi
 import { WagmiProvider } from "wagmi"
 import { sepolia } from "wagmi/chains"
-import { http } from "wagmi"
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query"
 import { SiteHeader } from "@/components/site-header"
 import { MainSidebar } from "@/components/main-sidebar"
 import { WalletConnectionOverlay } from "@/components/wallet-connection-overlay"
 import { usePathname } from "next/navigation"
+import { configureTransports } from "@/utils/rpc-provider"
+// Add the RPC Status Monitor to the layout
+import { RpcStatusMonitor } from "@/components/rpc-status-monitor"
 
 const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID!
 
-// Get the RPC URL from environment variables
-const sepoliaRpcUrl = process.env.NEXT_PUBLIC_SEPOLIA_RPC_URL
-
-// Create a custom config with your Infura RPC URL
+// Create a custom config with fallback RPC providers
 const config = getDefaultConfig({
   appName: "SixNine(69)",
   projectId: projectId,
   chains: [sepolia],
   ssr: true,
-  // Fix the transports configuration to use the http function
-  transports: {
-    [sepolia.id]: sepoliaRpcUrl ? http(sepoliaRpcUrl) : http(`https://sepolia.infura.io/v3/${projectId}`),
-  },
+  // Use our configured transports with fallback capability
+  transports: configureTransports(),
 })
 
 const queryClient = new QueryClient()
@@ -53,6 +49,7 @@ export default function RootLayout({
         <WagmiProvider config={config}>
           <QueryClientProvider client={queryClient}>
             <RainbowKitProvider>
+              {/* Add it inside the main div, just before the Toaster */}
               <div className={`relative flex min-h-screen flex-col ${isDiceGamePage ? "hide-scrollbar" : ""}`}>
                 <SiteHeader />
                 <MainSidebar />
@@ -60,6 +57,7 @@ export default function RootLayout({
                   {children}
                 </main>
                 <WalletConnectionOverlay />
+                <RpcStatusMonitor />
               </div>
               <Toaster
                 position="bottom-right"

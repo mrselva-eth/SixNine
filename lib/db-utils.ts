@@ -776,7 +776,9 @@ export async function getLeaderboard(
   let sortedData
   switch (metric) {
     case "balance":
-      sortedData = leaderboardData.sort((a, b) => BigInt(b.balance) - BigInt(a.balance))
+      sortedData = leaderboardData.sort((a, b) => {
+        return BigInt(b.balance) > BigInt(a.balance) ? 1 : BigInt(b.balance) < BigInt(a.balance) ? -1 : 0
+      })
       break
     case "totalBets":
       sortedData = leaderboardData.sort((a, b) => b.totalBets - a.totalBets)
@@ -788,10 +790,14 @@ export async function getLeaderboard(
       sortedData = leaderboardData.sort((a, b) => b.winRate - a.winRate)
       break
     case "highestWin":
-      sortedData = leaderboardData.sort((a, b) => BigInt(b.highestWin) - BigInt(a.highestWin))
+      sortedData = leaderboardData.sort((a, b) => {
+        return BigInt(b.highestWin) > BigInt(a.highestWin) ? 1 : BigInt(b.highestWin) < BigInt(a.highestWin) ? -1 : 0
+      })
       break
     default:
-      sortedData = leaderboardData.sort((a, b) => BigInt(b.balance) - BigInt(a.balance))
+      sortedData = leaderboardData.sort((a, b) => {
+        return BigInt(b.balance) > BigInt(a.balance) ? 1 : BigInt(b.balance) < BigInt(a.balance) ? -1 : 0
+      })
   }
 
   // Return only users who have placed at least one bet
