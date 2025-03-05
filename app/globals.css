@@ -1,0 +1,784 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "Orbitron";
+  src: url("/fonts/Orbitron.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 217 91% 60%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 217 91% 60%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 217 91% 60%;
+  --radius: 0.5rem;
+  --font-orbitron: "Orbitron", sans-serif;
+}
+
+.dark {
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+  --card: 222.2 84% 4.9%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222.2 84% 4.9%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 217 91% 60%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --accent: 217 91% 60%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 217 91% 60%;
+}
+
+body {
+  @apply bg-black text-gray-100;
+  font-family: var(--font-orbitron);
+}
+
+.button {
+  position: relative;
+  padding: 10px 22px;
+  border-radius: 6px;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  background-color: #3b82f6;
+  transition: all 0.2s ease;
+  font-family: var(--font-orbitron);
+}
+
+.button:active {
+  transform: scale(0.96);
+}
+
+.button:before,
+.button:after {
+  position: absolute;
+  content: "";
+  width: 150%;
+  left: 50%;
+  height: 100%;
+  transform: translateX(-50%);
+  z-index: -1000;
+  background-repeat: no-repeat;
+}
+
+.button:hover:before {
+  top: -70%;
+  background-image: radial-gradient(circle, #3b82f6 20%, transparent 20%),
+    radial-gradient(circle, transparent 20%, #3b82f6 20%, transparent 30%),
+    radial-gradient(circle, #3b82f6 20%, transparent 20%), radial-gradient(circle, #3b82f6 20%, transparent 20%),
+    radial-gradient(circle, transparent 10%, #3b82f6 15%, transparent 20%),
+    radial-gradient(circle, #3b82f6 20%, transparent 20%), radial-gradient(circle, #3b82f6 20%, transparent 20%),
+    radial-gradient(circle, #3b82f6 20%, transparent 20%), radial-gradient(circle, #3b82f6 20%, transparent 20%);
+  background-size: 10% 10%, 20% 20%, 15% 15%, 20% 20%, 18% 18%, 10% 10%, 15% 15%, 10% 10%, 18% 18%;
+  background-position: 50% 120%;
+  animation: greentopBubbles 0.6s ease;
+}
+
+@keyframes greentopBubbles {
+  0% {
+    background-position: 5% 90%, 10% 90%, 10% 90%, 15% 90%, 25% 90%, 25% 90%, 40% 90%, 55% 90%, 70% 90%;
+  }
+
+  50% {
+    background-position: 0% 80%, 0% 20%, 10% 40%, 20% 0%, 30% 30%, 22% 50%, 50% 50%, 65% 20%, 90% 30%;
+  }
+
+  100% {
+    background-position: 0% 70%, 0% 10%, 10% 30%, 20% -10%, 30% 20%, 22% 40%, 50% 40%, 65% 10%, 90% 20%;
+    background-size: 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%;
+  }
+}
+
+.button:hover::after {
+  bottom: -70%;
+  background-image: radial-gradient(circle, #3b82f6 20%, transparent 20%),
+    radial-gradient(circle, #3b82f6 20%, transparent 20%),
+    radial-gradient(circle, transparent 10%, #3b82f6 15%, transparent 20%),
+    radial-gradient(circle, #3b82f6 20%, transparent 20%), radial-gradient(circle, #3b82f6 20%, transparent 20%),
+    radial-gradient(circle, #3b82f6 20%, transparent 20%), radial-gradient(circle, #3b82f6 20%, transparent 20%);
+  background-size: 15% 15%, 20% 20%, 18% 18%, 20% 20%, 15% 15%, 20% 20%, 18% 18%;
+  background-position: 50% 0%;
+  animation: greenbottomBubbles 0.6s ease;
+}
+
+@keyframes greenbottomBubbles {
+  0% {
+    background-position: 10% -10%, 30% 10%, 55% -10%, 70% -10%, 85% -10%, 70% -10%, 70% 0%;
+  }
+
+  50% {
+    background-position: 0% 80%, 20% 80%, 45% 60%, 60% 100%, 75% 70%, 95% 60%, 105% 0%;
+  }
+
+  100% {
+    background-position: 0% 90%, 20% 90%, 45% 70%, 60% 110%, 75% 80%, 95% 70%, 110% 10%;
+    background-size: 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%;
+  }
+}
+
+/* Add the new button styles for the Roll Dice button */
+.cti {
+  background-color: #01ffff;
+  padding: 17px 30px;
+  border: 3px solid transparent;
+  border-radius: 0.6em;
+  transition: 0.2s;
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.cti::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #01ffff, #0066ff, #01ffff);
+  z-index: -2;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 0.7em;
+}
+
+.cti::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  background-color: #01ffff;
+  border-radius: 0.5em;
+  z-index: -1;
+  transition: all 0.3s ease;
+}
+
+.cti:hover {
+  background-color: transparent;
+  border: 3px solid transparent;
+  box-shadow: 0px 0px 27px 5px #01ffff;
+}
+
+.cti:hover::before {
+  opacity: 1;
+  animation: rotate 2s linear infinite;
+}
+
+.cti:hover::after {
+  background-color: #000;
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.CTI {
+  color: #000;
+  font-family: var(--font-orbitron);
+  font-size: 17px;
+  font-weight: bold;
+  overflow: hidden;
+  border-right: 4px solid transparent;
+  white-space: nowrap;
+  margin: 0 auto;
+  text-align: center;
+  transition: color 0.3s ease;
+}
+
+.cti:hover .CTI {
+  color: #fff;
+  border-right: 4px solid #01ffff;
+  animation: letters 1.75s steps(22, end), cursor .4s step-end infinite;
+}
+
+@keyframes letters {
+  from {
+    width: 0;
+  }
+
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes cursor {
+  from {
+    border-color: transparent;
+  }
+
+  50% {
+    border-color: #01ffff;
+  }
+}
+
+/* Connect Wallet Button Styles */
+.container {
+  width: 1000px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+
+.container .btn {
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 250px;
+  height: 50px;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container .btn a {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 15px 15px rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 30px;
+  padding: 10px;
+  letter-spacing: 1px;
+  text-decoration: none;
+  overflow: hidden;
+  color: #fff;
+  font-weight: 400px;
+  z-index: 1;
+  transition: 0.5s;
+  backdrop-filter: blur(15px);
+  white-space: pre-line;
+  line-height: 1.2;
+  font-family: var(--font-orbitron);
+}
+
+.container .btn:hover a {
+  letter-spacing: 3px;
+  color: #000;
+}
+
+.container .btn a::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to left, rgba(255, 255, 255, 0.15), transparent);
+  transform: skewX(45deg) translate(0);
+  transition: 0.5s;
+  filter: blur(0px);
+}
+
+.container .btn:hover a::before {
+  transform: skewX(45deg) translate(200px);
+}
+
+.container .btn::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translatex(-50%);
+  bottom: -5px;
+  width: 30px;
+  height: 10px;
+  background: #f00;
+  border-radius: 10px;
+  transition: 0.5s;
+  transition-delay: 0.5;
+}
+
+.container .btn:hover::before /*lightup button*/ {
+  bottom: 0;
+  height: 50%;
+  width: 80%;
+  border-radius: 30px;
+}
+
+.container .btn::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translatex(-50%);
+  top: -5px;
+  width: 30px;
+  height: 10px;
+  background: #f00;
+  border-radius: 10px;
+  transition: 0.5s;
+  transition-delay: 0.5;
+}
+
+.container .btn:hover::after /*lightup button*/ {
+  top: 0;
+  height: 50%;
+  width: 80%;
+  border-radius: 30px;
+}
+
+.container .btn:nth-child(1)::before,
+.container .btn:nth-child(1)::after {
+  background: #01ffff;
+  box-shadow: 0 0 5px #01ffff, 0 0 15px #01ffff, 0 0 30px #01ffff, 0 0 60px #01ffff;
+}
+
+/* Apply Orbitron font to all inputs and form elements */
+input,
+button,
+select,
+textarea {
+  font-family: var(--font-orbitron);
+}
+
+/* Apply Orbitron font to all headings */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-orbitron);
+}
+
+/* Mint 69USDC Button */
+/* Update the mint-button width */
+.mint-button {
+  position: relative;
+  width: 16em; /* Increased from 14em to 16em */
+  height: 3.5em;
+  outline: none;
+  transition: 0.1s;
+  background-color: transparent;
+  border: none;
+  font-size: 13px;
+  font-weight: bold;
+  color: #ddebf0;
+}
+
+/* Rest of the mint-button related styles remain the same */
+.mint-button #clip {
+  --color: #2761c3;
+  position: absolute;
+  top: 0;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  border: 5px double var(--color);
+  box-shadow: inset 0px 0px 15px #195480;
+  -webkit-clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+}
+
+.mint-button .arrow {
+  position: absolute;
+  transition: 0.2s;
+  background-color: #2761c3;
+  top: 35%;
+  width: 11%;
+  height: 30%;
+}
+
+.mint-button #leftArrow {
+  left: -13.5%;
+  -webkit-clip-path: polygon(100% 0, 100% 100%, 0 50%);
+}
+
+.mint-button #rightArrow {
+  -webkit-clip-path: polygon(100% 49%, 0 0, 0 100%);
+  left: 102%;
+}
+
+.mint-button:hover #rightArrow {
+  background-color: #01ffff;
+  left: -15%;
+  animation: 0.6s ease-in-out both infinite alternate rightArrow8;
+}
+
+.mint-button:hover #leftArrow {
+  background-color: #01ffff;
+  left: 103%;
+  animation: 0.6s ease-in-out both infinite alternate leftArrow8;
+}
+
+.mint-button .corner {
+  position: absolute;
+  width: 4em;
+  height: 4em;
+  background-color: #2761c3;
+  box-shadow: inset 1px 1px 8px #2781c3;
+  transform: scale(1) rotate(45deg);
+  transition: 0.2s;
+}
+
+.mint-button #rightTop {
+  top: -1.98em;
+  left: 91%;
+}
+
+.mint-button #leftTop {
+  top: -1.96em;
+  left: -3.0em;
+}
+
+.mint-button #leftBottom {
+  top: 2.10em;
+  left: -2.15em;
+}
+
+.mint-button #rightBottom {
+  top: 45%;
+  left: 88%;
+}
+
+.mint-button:hover #leftTop {
+  animation: 0.1s ease-in-out 0.05s both changeColor8, 0.2s linear 0.4s both lightEffect8;
+}
+
+.mint-button:hover #rightTop {
+  animation: 0.1s ease-in-out 0.15s both changeColor8, 0.2s linear 0.4s both lightEffect8;
+}
+
+.mint-button:hover #rightBottom {
+  animation: 0.1s ease-in-out 0.25s both changeColor8, 0.2s linear 0.4s both lightEffect8;
+}
+
+.mint-button:hover #leftBottom {
+  animation: 0.1s ease-in-out 0.35s both changeColor8, 0.2s linear 0.4s both lightEffect8;
+}
+
+.mint-button:hover .corner {
+  transform: scale(1.25) rotate(45deg);
+}
+
+.mint-button:hover #clip {
+  animation: 0.2s ease-in-out 0.55s both greenLight8;
+  --color: #01ffff;
+}
+
+@keyframes changeColor8 {
+  from {
+    background-color: #2781c3;
+  }
+
+  to {
+    background-color: #01ffff;
+  }
+}
+
+@keyframes lightEffect8 {
+  from {
+    box-shadow: 1px 1px 5px #01ffff;
+  }
+
+  to {
+    box-shadow: 0 0 2px #01ffff;
+  }
+}
+
+@keyframes greenLight8 {
+  from {
+  }
+
+  to {
+    box-shadow: inset 0px 0px 32px #01ffff;
+  }
+}
+
+@keyframes leftArrow8 {
+  from {
+    transform: translate(0px);
+  }
+
+  to {
+    transform: translateX(10px);
+  }
+}
+
+@keyframes rightArrow8 {
+  from {
+    transform: translate(0px);
+  }
+
+  to {
+    transform: translateX(-10px);
+  }
+}
+
+/* Add the transaction overlay base styles if they don't exist */
+.transaction-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.transaction-status {
+  color: white;
+  font-family: var(--font-orbitron);
+  margin-top: 20px;
+  font-size: 18px;
+  text-align: center;
+}
+
+/* New animation CSS */
+.container {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container .square {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+}
+
+.container .square:nth-child(2) {
+  transform: translate(-25%, -25%) rotateX(180deg);
+  filter: hue-rotate(60deg);
+}
+
+.container .square:nth-child(3) {
+  transform: translate(25%, 25%) rotate(180deg);
+  filter: hue-rotate(180deg);
+}
+
+.container .square::before {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: #0f0;
+  box-shadow: 0 0 0 8px #0f03, 0 0 0 15px #0f01;
+  animation: animateSquare 4s linear infinite;
+}
+
+@keyframes animateSquare {
+  0% {
+    transform: translate(2px, 2px);
+  }
+
+  25% {
+    transform: translate(178px, 2px);
+  }
+
+  50% {
+    transform: translate(178px, 178px);
+  }
+
+  75% {
+    transform: translate(2px, 178px);
+  }
+
+  100% {
+    transform: translate(2px, 2px);
+  }
+}
+
+.container .square span {
+  position: absolute;
+  inset: 10px;
+  overflow: hidden;
+  transform: rotate(calc(90deg * var(--i)));
+}
+
+.container .square span::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 4px;
+  background: #0f0;
+  transform: translateX(-100%);
+  animation: animate 4s linear infinite;
+  animation-delay: calc(1s * var(--i));
+}
+
+@keyframes animate {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  50%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Add these custom scrollbar styles at the end of the file */
+
+/* Custom scrollbar for all pages */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #01ffff;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #01ffff80;
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #01ffff rgba(0, 0, 0, 0.2);
+}
+
+/* Hide scrollbar class for dice game page */
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+/* Update font styles for headings */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-orbitron);
+  letter-spacing: 0.05em;
+}
+
+/* Update the game balance box style */
+.game-balance-box {
+  background: rgba(1, 255, 255, 0.1);
+  border: 1px solid rgba(1, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+}
+
+/* Update button hover effects */
+.cti:hover {
+  text-shadow: 0 0 10px rgba(1, 255, 255, 0.5);
+  box-shadow: 0 0 20px rgba(1, 255, 255, 0.2);
+}
+
+/* Update panel backgrounds */
+.game-panel {
+  background: rgba(26, 31, 46, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(1, 255, 255, 0.1);
+  box-shadow: 0 4px 24px rgba(1, 255, 255, 0.05);
+}
+
+/* Add these new styles at the end of the file */
+
+/* Animated background for dice game */
+@keyframes pulse-glow {
+  0% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+}
+
+/* Update TabsTrigger for a more futuristic look */
+.TabsTrigger {
+  position: relative;
+  overflow: hidden;
+}
+
+.TabsTrigger[data-state="active"]::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #01ffff, #0066ff, #01ffff);
+  z-index: -1;
+  animation: rotate 2s linear infinite;
+  opacity: 0.5;
+  border-radius: 0.3em;
+}
+
+/* Home page specific animations */
+.animate-spin-slow {
+  animation: spin 15s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
