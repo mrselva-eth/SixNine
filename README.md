@@ -2,6 +2,14 @@
 
 A blockchain-based dice game running on the Sepolia Ethereum testnet with provably fair mechanics, multiple betting options, and comprehensive statistics tracking.
 
+## Interface 
+
+![image](https://github.com/user-attachments/assets/d3c895e0-76de-4490-b578-a0d7c28df774)
+
+
+## Deployed Link : https://sixninedice.netlify.app/
+
+
 ## Overview
 
 SixNine(69) is a provably fair dice game built on the Ethereum blockchain (Sepolia testnet). Players can bet 69USDC tokens on dice rolls with various betting options and verify the fairness of each roll through cryptographic proofs. The platform includes features like game history, balance visualization, leaderboards, and an AI assistant.
