@@ -8,6 +8,7 @@ import { use69UsdcBalance } from "@/utils/token-contract"
 import { fetchGameBalance } from "@/utils/game-contract"
 import { WithdrawDialog } from "./withdraw-dialog"
 import { DepositDialog } from "./deposit-dialog"
+import { ChevronRight } from "lucide-react"
 
 export function SiteHeader() {
   const { address, isConnected } = useAccount()
@@ -84,7 +85,11 @@ export function SiteHeader() {
             )}
           </div>
 
-          <div className="flex items-center">
+          <div className="flex items-center gap-3">
+            <div className="hidden md:flex items-center text-gray-400 text-sm">
+              <span>Wallet Details And More</span>
+              <ChevronRight className="h-4 w-4 animate-pulse text-[#0affff]" />
+            </div>
             <CustomConnectButton />
           </div>
         </div>
